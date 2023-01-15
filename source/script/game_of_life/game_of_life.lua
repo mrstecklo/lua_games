@@ -2,6 +2,9 @@ gl = require("opengl")
 glut = require("glut")
 local help = require("game_of_life.help")
 
+local args
+local map
+
 local window = {
     width = 800,
     height = 800,
@@ -14,7 +17,11 @@ local neighbours = {
 }
 
 local function idx(t, x, y)
-    return x % t.height + ((y - 1) % t.width) * t.width
+    if not args.wrap and (x < 1 or x > t.width or y < 1 or y > t.height) then
+        return nil
+    else
+        return x % t.height + ((y - 1) % t.width) * t.width
+    end
 end
 
 local function at(t, x, y)
@@ -164,9 +171,24 @@ function OnKey(key, px, py)
     DrawFrame()
 end
 
-local map_module = select(1, ...) or "help"
+local function parse_args(...)
+    local args = {}
+    for _, val in ipairs({...}) do
+        if string.find(val, "^-") then
+            if val == "--wrap" then
+                args.wrap = true
+            end
+        else
+            args.map_module = val
+        end
+    end
+    args.map_module = args.map_module or "help"
+    return args
+end
 
-map = CopyMap(require("game_of_life." .. map_module))
+args = parse_args(...)
+
+map = CopyMap(require("game_of_life." .. args.map_module))
 
 glut.Init()
 glut.InitDisplayMode()

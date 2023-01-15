@@ -163,23 +163,33 @@ function OnKey(key, px, py)
     DrawFrame()
 end
 
-function OnMouseButton(button, state, px, py)
+local mouse_button
+local function HandleMouseButton(px, py)
     local MB_LEFT = 0
     local MB_RIGHT = 2
-
-    local MBS_DOWN = 0
 
     local x = px * map.width // window.width + 1
     local y = py * map.height // window.height + 1
 
-    if state == MBS_DOWN then
-        if button == MB_LEFT then
-            map[idx(map, x, y)] = 1
-        elseif button == MB_RIGHT then
-            map[idx(map, x, y)] = nil
-        end
+    if mouse_button == MB_LEFT then
+        map[idx(map, x, y)] = 1
+    elseif mouse_button == MB_RIGHT then
+        map[idx(map, x, y)] = nil
     end
     DrawFrame()
+end
+
+function OnMouseButton(button, state, px, py)
+    local MBS_DOWN = 0
+
+    if state == MBS_DOWN then
+        mouse_button = button
+        HandleMouseButton(px, py)
+    end
+end
+
+function OnMouseMotion(px, py)
+    HandleMouseButton(px, py)
 end
 
 local function parse_args(...)
@@ -209,5 +219,6 @@ glut.DisplayFunc('DrawFrame')
 glut.ReshapeFunc('Reshape')
 glut.KeyboardFunc('OnKey')
 glut.MouseFunc('OnMouseButton')
+glut.MotionFunc('OnMouseMotion')
 
 glut.MainLoop()

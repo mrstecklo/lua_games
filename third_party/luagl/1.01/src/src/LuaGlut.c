@@ -35,6 +35,7 @@ typedef struct callbackFunc_typ {
 static callbackFunc displayFunc;
 static callbackFunc keyboardFunc;
 static callbackFunc mouseFunc;
+static callbackFunc motionFunc;
 static callbackFunc reshapeFunc;
 static callbackFunc idleFunc;
 
@@ -87,6 +88,25 @@ static void mouse_func(int button, int state, int x, int y)
       {
          printf("Error running lua script:\n\n  %s \n\n", lua_tostring(mouseFunc.luastate, -1));
          lua_pop(mouseFunc.luastate, 1);
+      }
+   }
+}
+void motion_func(int x, int y)
+{
+   lua_getglobal(motionFunc.luastate, motionFunc.name);
+
+   if(!lua_isfunction(motionFunc.luastate, -1))
+      printf("Script error: cannot find %s function.\n\n", motionFunc.name);
+
+   else
+   {
+      lua_pushnumber(motionFunc.luastate, x);
+      lua_pushnumber(motionFunc.luastate, y);
+
+      if(lua_pcall(motionFunc.luastate, 2, 0, 0))
+      {
+         printf("Error running lua script:\n\n  %s \n\n", lua_tostring(motionFunc.luastate, -1));
+         lua_pop(motionFunc.luastate, 1);
       }
    }
 }
@@ -209,6 +229,16 @@ static int glut_mouse_func(lua_State *L)
    glutMouseFunc(mouse_func);
    return 0;
 }
+static int glut_motion_func(lua_State *L)
+{
+   if(!lua_isstring(L, 1))
+      luaL_error(L, "incorrect argument to function 'glut.MotionFunc'");
+   motionFunc.name = lua_tostring(L, 1);
+   motionFunc.luastate = L;
+
+   glutMotionFunc(motion_func);
+   return 0;
+}
 static int glut_reshape_func(lua_State *L)
 {
    if(!lua_isstring(L, 1))
@@ -247,6 +277,7 @@ static const luaL_Reg glutlib[] = {
   {"InitWindowSize", glut_init_window_size},
   {"KeyboardFunc", glut_keyboard_func},
   {"MouseFunc", glut_mouse_func},
+  {"MotionFunc", glut_motion_func},
   {"MainLoop", glut_main_loop},
   {"PostRedisplay", glut_post_redisplay},
   {"ReshapeFunc", glut_reshape_func},

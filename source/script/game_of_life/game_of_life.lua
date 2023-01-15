@@ -1,5 +1,6 @@
 gl = require("opengl")
 glut = require("glut")
+local help = require("game_of_life.help")
 
 local window = {
     width = 800,
@@ -32,6 +33,14 @@ local function EmptyMap(first, second)
             height = second,
         }
     end
+end
+
+local function CopyMap(t)
+    local r = EmptyMap(t)
+    for i = 1, t.width * t.height do
+        r[i] = t[i]
+    end
+    return r
 end
 
 local function RandomMap(first, second)
@@ -150,12 +159,12 @@ function OnKey(key, px, py)
     elseif key == KEY_C then
         map = EmptyMap(map)
     elseif key == KEY_H then
-        map = require("game_of_life.help")
+        map = CopyMap(help)
     end
     DrawFrame()
 end
 
-map = require("game_of_life.help")
+map = CopyMap(help)
 
 glut.Init()
 glut.InitDisplayMode()

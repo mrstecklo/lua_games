@@ -207,7 +207,7 @@ static int glut_swap_buffers(lua_State *L)
    return 0;
 }
 
-static const luaL_reg glutlib[] = {
+static const luaL_Reg glutlib[] = {
   {"CreateWindow", glut_create_window},
   {"DisplayFunc", glut_display_func},
   {"IdleFunc", glut_idle_func},
@@ -223,6 +223,6 @@ static const luaL_reg glutlib[] = {
 };
 
 LUAGLUT_API int luaopen_glut (lua_State *L){
-  luaL_openlib(L, "glut", glutlib, 0);
+  luaL_newlib(L, glutlib);
   return 1;
 }

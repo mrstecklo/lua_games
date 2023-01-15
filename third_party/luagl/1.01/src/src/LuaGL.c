@@ -91,7 +91,7 @@ static const char *get_str_gl_enum(GLenum num)
 static int get_arrayb(lua_State *L, int index, GLboolean **array)
 {
    int i;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    *array = (GLboolean *)malloc(n * sizeof(GLboolean));
    for(i = 0; i < n; i++)
@@ -105,7 +105,7 @@ static int get_arrayb(lua_State *L, int index, GLboolean **array)
 static int get_arrayd(lua_State *L, int index, GLdouble **array)
 {
    int i;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    *array = (GLdouble *)malloc(n * sizeof(GLdouble));
 
@@ -120,7 +120,7 @@ static int get_arrayd(lua_State *L, int index, GLdouble **array)
 static int get_arrayf(lua_State *L, int index, GLfloat **array)
 {
    int i;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    *array = (GLfloat *)malloc(n * sizeof(GLfloat));
 
@@ -135,7 +135,7 @@ static int get_arrayf(lua_State *L, int index, GLfloat **array)
 static int get_arrayui(lua_State *L, int index, GLuint **array)
 {
    int i;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    *array = (GLuint *)malloc(n * sizeof(GLint));
 
@@ -150,7 +150,7 @@ static int get_arrayui(lua_State *L, int index, GLuint **array)
 static int get_arrayubyte(lua_State *L, int index, GLubyte **array)
 {
    int i;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    *array = (GLubyte *)malloc(n * sizeof(GLubyte));
 
@@ -165,7 +165,7 @@ static int get_arrayubyte(lua_State *L, int index, GLubyte **array)
 static int get_array2ubyte(lua_State *L, int index, GLubyte **array, int *size)
 {
    int i, j;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    lua_rawgeti(L, index, 1);
 
@@ -175,7 +175,7 @@ static int get_array2ubyte(lua_State *L, int index, GLubyte **array, int *size)
       return -1;
    }
 
-   *size = luaL_getn(L, -1);
+   *size = lua_objlen(L, -1);
 
    *array = (GLubyte *)malloc(n * (*size) * sizeof(GLubyte));
 
@@ -202,7 +202,7 @@ static int get_array2ubyte(lua_State *L, int index, GLubyte **array, int *size)
 static int get_array2d(lua_State *L, int index, GLdouble **array, int *size)
 {
    int i, j;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    lua_rawgeti(L, index, 1);
 
@@ -212,7 +212,7 @@ static int get_array2d(lua_State *L, int index, GLdouble **array, int *size)
       return -1;
    }
 
-   *size = luaL_getn(L, -1);
+   *size = lua_objlen(L, -1);
 
    *array = (GLdouble *)malloc(n * (*size) * sizeof(GLdouble));
 
@@ -238,7 +238,7 @@ static int get_array2d(lua_State *L, int index, GLdouble **array, int *size)
 static int get_array2f(lua_State *L, int index, GLfloat **array, int *size)
 {
    int i, j;
-   int n = luaL_getn(L, index);
+   int n = lua_objlen(L, index);
 
    lua_rawgeti(L, index, 1);
 
@@ -248,7 +248,7 @@ static int get_array2f(lua_State *L, int index, GLfloat **array, int *size)
       return -1;
    }
 
-   *size = luaL_getn(L, -1);
+   *size = lua_objlen(L, -1);
 
    *array = (GLfloat *)malloc(n * (*size) * sizeof(GLfloat));
 
@@ -2557,7 +2557,7 @@ static int gl_load_matrix(lua_State *L)
    GLdouble *m;
 
    /* test argument type and the number of arguments in the array, must be 16 values */
-   if(!lua_istable(L, 1) || luaL_getn(L, 1) < 16)
+   if(!lua_istable(L, 1) || lua_objlen(L, 1) < 16)
       luaL_error(L, "incorrect argument to function 'gl.LoadMatrix'");
 
    /* get argument */
@@ -2795,7 +2795,7 @@ static int gl_mult_matrix(lua_State *L)
    GLdouble *m;
 
    /* test argument type and the number of arguments in the array, must be 16 values */
-   if(!lua_istable(L, 1) || luaL_getn(L, 1) < 16)
+   if(!lua_istable(L, 1) || lua_objlen(L, 1) < 16)
       luaL_error(L, "incorrect argument to function 'gl.MultMatrix'");
 
    /* get argument */
@@ -3945,7 +3945,7 @@ static int gl_viewport(lua_State *L)
    return 0;
 }
 
-static const luaL_reg gllib[] = {
+static const luaL_Reg gllib[] = {
   {"Accum", gl_accum},
   {"AlphaFunc", gl_alpha_func},
   {"AreTexturesResident", gl_are_textures_resident},
@@ -4088,6 +4088,6 @@ static const luaL_reg gllib[] = {
 };
 
 LUAGL_API int luaopen_opengl (lua_State *L) {
-  luaL_openlib(L, "gl", gllib, 0);
+  luaL_newlib(L, gllib);
   return 1;
 }

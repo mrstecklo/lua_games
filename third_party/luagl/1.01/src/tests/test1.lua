@@ -1,3 +1,6 @@
+gl = require("opengl")
+glut = require("glut")
+
 function ShowArray(v)
   if(v == nil) then  f:write( ' - nil array - ') return end
   f:write( '{ ')
@@ -122,7 +125,7 @@ function TestTexture(image, n, target, iformat, format, level, priorities)
 
     if(target == 'TEXTURE_1D') then
       testwidth = gl.GetTexLevelParameter(target, level, 'TEXTURE_WIDTH')
-      Compare(testwidth, table.getn(image)/iformat)
+      Compare(testwidth, #image/iformat)
       CompareArrayC(image, testimage)
 
       image2 = {}
@@ -148,8 +151,8 @@ function TestTexture(image, n, target, iformat, format, level, priorities)
     elseif(target == 'TEXTURE_2D') then
       testwidth = gl.GetTexLevelParameter(target, level, 'TEXTURE_WIDTH')
       testheight = gl.GetTexLevelParameter(target, level, 'TEXTURE_HEIGHT')
-      Compare(testwidth, table.getn(image[1]) / iformat )
-      Compare(testheight, table.getn(image))
+      Compare(testwidth, #image[1] / iformat )
+      Compare(testheight, #image)
 
       image2 = CreateArray(image)
       CompareArrayC(image2, testimage)

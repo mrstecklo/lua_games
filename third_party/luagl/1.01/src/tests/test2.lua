@@ -1,3 +1,6 @@
+gl = require("opengl")
+glut = require("glut")
+
 function Reshape(width, height)
 
   gl.Viewport(0, 0, width, height)

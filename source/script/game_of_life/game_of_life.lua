@@ -165,6 +165,10 @@ end
 
 local mouse_button
 local function HandleMouseButton(px, py)
+    if px >= window.width or px < 0 or py >= window.height or py < 0 then
+        return
+    end
+
     local MB_LEFT = 0
     local MB_RIGHT = 2
 

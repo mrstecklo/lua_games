@@ -23,3 +23,11 @@ add_lua_test(game_of_life/wrap_with_map
 add_lua_test(game_of_life/with_map_wrap
     ARGS game_of_life/game_of_life.lua gospers_gun --wrap
 )
+
+add_lua_test(game_of_life/square
+    ARGS game_of_life/game_of_life.lua square
+)
+
+add_lua_test(game_of_life/rectangle
+    ARGS game_of_life/game_of_life.lua rectangle
+)

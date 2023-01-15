@@ -20,7 +20,7 @@ local function idx(t, x, y)
     if not args.wrap and (x < 1 or x > t.width or y < 1 or y > t.height) then
         return nil
     else
-        return x % t.height + ((y - 1) % t.width) * t.width
+        return (x - 1) % t.width + ((y - 1) % t.height) * t.width + 1
     end
 end
 

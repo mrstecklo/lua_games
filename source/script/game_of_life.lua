@@ -20,25 +20,22 @@ local function at(t, x, y)
     return t[idx(t, x, y)]
 end
 
-local function ClearMap(t)
-    return  {
-        width = t.width,
-        height = t.height,
-    }
+local function EmptyMap(first, second)
+    if type(first) == "table" then
+        return  {
+            width = first.width,
+            height = first.height,
+        }
+    else
+        return {
+            width = first,
+            height = second,
+        }
+    end
 end
 
-local function InitMap(first, height)
-    local width
-    if type(first) == "table" then
-        height = first.height
-        width = first.width
-    else
-        width = first
-    end
-    local t = {
-        width = width,
-        height = height,
-    }
+local function RandomMap(first, second)
+    local t = EmptyMap(first, second)
     for x = 1, t.width do
         for y = 1, t.height do
             if math.random(9) == 1 then
@@ -50,8 +47,8 @@ local function InitMap(first, height)
 end
 
 local function DumpMap(t)
-    local file = io.open("map.lua", "w+")
-    file:write("map = {\n")
+    local file = io.open("map_" .. math.abs(math.random(0)) .. ".lua", "w+")
+    file:write("return {\n")
     file:write("    width = ", t.width, ",\n")
     file:write("    height = ", t.height, ",\n")
     for y = 1, t.height do
@@ -62,6 +59,7 @@ local function DumpMap(t)
         file:write("\n")
     end
     file:write("}\n")
+    file:close()
 end
 
 local function DrapMap(t, scale)
@@ -79,10 +77,7 @@ local function DrapMap(t, scale)
 end
 
 local function NextGeneration(t)
-    local ng = {
-        width = t.width,
-        height = t.height
-    }
+    local ng = EmptyMap(t)
     for x = 1, t.width do
         for y = 1, t.height do
             local count = 0
@@ -151,9 +146,9 @@ function OnKey(key, px, py)
     elseif key == KEY_M then
         DumpMap(map)
     elseif key == KEY_R then
-        map = InitMap(map)
+        map = RandomMap(map)
     elseif key == KEY_C then
-        map = ClearMap(map)
+        map = EmptyMap(map)
     elseif key == KEY_H then
         map = require("help")
     end

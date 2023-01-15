@@ -1,11 +1,9 @@
-add_test(
-    NAME third_party/luagl
-    COMMAND lua luagl/test1.lua
-    WORKING_DIRECTORY ${RUNTIME_DIRECTORY}
+include("test")
+
+add_lua_test(third_party/luagl
+    ARGS luagl/test1.lua
 )
 
-add_test(
-    NAME game_of_life
-    COMMAND lua ${CMAKE_SOURCE_DIR}/source/script/game_of_life.lua
-    WORKING_DIRECTORY ${RUNTIME_DIRECTORY}
+add_lua_test(game_of_life
+    ARGS game_of_life/game_of_life.lua
 )

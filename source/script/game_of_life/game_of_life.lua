@@ -150,12 +150,12 @@ function OnKey(key, px, py)
     elseif key == KEY_C then
         map = EmptyMap(map)
     elseif key == KEY_H then
-        map = require("help")
+        map = require("game_of_life.help")
     end
     DrawFrame()
 end
 
-map = require("help")
+map = require("game_of_life.help")
 
 glut.Init()
 glut.InitDisplayMode()

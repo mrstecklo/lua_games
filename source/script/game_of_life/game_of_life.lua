@@ -144,21 +144,13 @@ end
 
 function OnKey(key, px, py)
     local SPACE = 32
-    local KEY_A = 97
-    local KEY_D = 100
     local KEY_H = 104
     local KEY_R = 114
     local KEY_M = 109
     local KEY_C = 99
 
-    local x = px * map.width // window.width + 1
-    local y = py * map.height // window.height + 1
     if key == SPACE then
         map = NextGeneration(map)
-    elseif key == KEY_A then
-        map[idx(map, x, y)] = 1
-    elseif key == KEY_D then
-        map[idx(map, x, y)] = nil
     elseif key == KEY_M then
         DumpMap(map)
     elseif key == KEY_R then
@@ -167,6 +159,25 @@ function OnKey(key, px, py)
         map = EmptyMap(map)
     elseif key == KEY_H then
         map = CopyMap(help)
+    end
+    DrawFrame()
+end
+
+function OnMouseButton(button, state, px, py)
+    local MB_LEFT = 0
+    local MB_RIGHT = 2
+
+    local MBS_DOWN = 0
+
+    local x = px * map.width // window.width + 1
+    local y = py * map.height // window.height + 1
+
+    if state == MBS_DOWN then
+        if button == MB_LEFT then
+            map[idx(map, x, y)] = 1
+        elseif button == MB_RIGHT then
+            map[idx(map, x, y)] = nil
+        end
     end
     DrawFrame()
 end
@@ -197,5 +208,6 @@ glut.CreateWindow('Game of Life')
 glut.DisplayFunc('DrawFrame')
 glut.ReshapeFunc('Reshape')
 glut.KeyboardFunc('OnKey')
+glut.MouseFunc('OnMouseButton')
 
 glut.MainLoop()

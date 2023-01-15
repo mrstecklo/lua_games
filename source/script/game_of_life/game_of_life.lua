@@ -202,18 +202,32 @@ local function parse_args(...)
         if string.find(val, "^-") then
             if val == "--wrap" then
                 args.wrap = true
+            elseif string.find(val, "^--size=") then
+                args.map_width, args.map_height = string.match(val, "^--size=(%d+)x(%d+)")
+                args.map_width = tonumber(args.map_width)
+                args.map_height = tonumber(args.map_height)
             end
         else
             args.map_module = val
         end
     end
-    args.map_module = args.map_module or "help"
     return args
 end
 
 args = parse_args(...)
 
-map = CopyMap(require("game_of_life." .. args.map_module))
+if args.map_width and args.map_height then
+    map = EmptyMap(args.map_width, args.map_height)
+end
+
+if args.map_module then
+    if map then
+        print("warning: both --size and <map_module> are specified. Ignoring --size option")
+    end
+    map = require("game_of_life." .. args.map_module)
+end
+
+map = map or CopyMap(require("game_of_life.help"))
 
 glut.Init()
 glut.InitDisplayMode()

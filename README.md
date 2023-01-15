@@ -9,5 +9,5 @@ cd runtime/<config>
 ```
 ## Game of Life
 ``` shell
-lua game_of_life/game_of_life.lua [--wrap] [<map_module>]
+lua game_of_life/game_of_life.lua [--wrap] [--size=<width>x<height> | <map_module>]
 ```

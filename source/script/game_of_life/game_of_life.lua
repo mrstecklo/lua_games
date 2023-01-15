@@ -164,7 +164,9 @@ function OnKey(key, px, py)
     DrawFrame()
 end
 
-map = CopyMap(help)
+local map_module = select(1, ...) or "help"
+
+map = CopyMap(require("game_of_life." .. map_module))
 
 glut.Init()
 glut.InitDisplayMode()

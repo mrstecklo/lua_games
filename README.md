@@ -3,7 +3,7 @@
 ``` shell
 mkdir temp
 cd temp
-cmake ..
+cmake -DMS_SDK_MAKEFILE_PATH=path/to/dir/with/Win32.mak ..
 cmake --build .
 cd runtime/<config>
 ```

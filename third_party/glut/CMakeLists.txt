@@ -15,7 +15,7 @@ ExternalProject_Add(glut.internal
         ${CMAKE_COMMAND} -E make_directory ${LIBINSTALL} ${INCLUDEINSTALL} ${DLLINSTALL}
     BUILD_COMMAND
         ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/lib/glut
-        ${CMAKE_COMMAND} -E env "INCLUDE=C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"
+        ${CMAKE_COMMAND} -E env "INCLUDE=${MS_SDK_MAKEFILE_PATH}"
         nmake
             nodebug=1
             LIBINSTALL=${LIBINSTALL}

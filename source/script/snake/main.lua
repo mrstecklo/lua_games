@@ -2,8 +2,8 @@ gl = require("opengl")
 glut = require("glut")
 
 local window = {
-    width = 800,
-    height = 800,
+    width = 600,
+    height = 600,
 }
 
 local dir = {
@@ -21,7 +21,18 @@ local map = {
 local snake
 local apple
 local direction = math.random(4)
+local new_direction = direction
 local time
+local state = true
+
+local function DirToString(direction)
+    for name, value in pairs(dir) do
+        if value == direction then
+            return name
+        end
+    end
+    return "INVALID"
+end
 
 local function NewSnake()
     return {
@@ -120,16 +131,29 @@ function OnKey(key, px, py)
     local KEY_S = 115
     local KEY_D = 100
 
-    if key == KEY_W and direction ~= dir.DOWN then
-        direction = dir.UP
-    elseif key == KEY_A and direction ~= dir.RIGHT then
-        direction = dir.LEFT
-    elseif key == KEY_S and direction ~= dir.UP then
-        direction = dir.DOWN
-    elseif key == KEY_D and direction ~= dir.LEFT then
-        direction = dir.RIGHT
-    elseif key == KEY_ESC then
+    local KEY_8 = 56
+    local KEY_2 = 50
+    local KEY_4 = 52
+    local KEY_6 = 54
+
+    if key == KEY_ESC then
         os.exit(true, true)
+    else
+        if state then
+            if (key == KEY_W or key == KEY_8) and direction ~= dir.DOWN then
+                new_direction = dir.UP
+            elseif (key == KEY_A or key == KEY_4) and direction ~= dir.RIGHT then
+                new_direction = dir.LEFT
+            elseif (key == KEY_S or key == KEY_2) and direction ~= dir.UP then
+                new_direction = dir.DOWN
+            elseif (key == KEY_D or key == KEY_6) and direction ~= dir.LEFT then
+                new_direction = dir.RIGHT
+            end
+        else
+            state = true
+            Init()
+            DrawFrame()
+        end
     end
 end
 
@@ -139,7 +163,7 @@ local function Move()
         x = head.x,
         y = head.y,
     }
-
+    direction = new_direction
     if direction == dir.UP then
         head.y = head.y - 1
     elseif direction == dir.DOWN then
@@ -151,11 +175,15 @@ local function Move()
     end
 
     if IsOutside(map, head) then
+        print("Outside map: ", head.x, head.y)
+        print("Direction:", DirToString(direction))
         return false
     end
 
     for _, p in pairs(snake) do
         if ArePointsEqual(head, p) then
+            print("Self collision: ", head.x, head.y)
+            print("Direction:", DirToString(direction))
             return false
         end
     end
@@ -171,15 +199,18 @@ local function Move()
 end
 
 function IdleFunc()
-    local now = os.time()
-    time = time or now
-    if os.difftime(now, time) > 0 then
-        time = now
-        if Move() then
-            DrawFrame()
-        else
-            DrawFrame{1, 0, 0, 1}
-            Init()
+    if state then
+        local now = os.time()
+        time = time or now
+        if os.difftime(now, time) > 0 then
+            time = now
+            if Move() then
+                DrawFrame()
+            else
+                print("Game over. Snake size: ", #snake)
+                DrawFrame{1, 0, 0, 1}
+                state = false
+            end
         end
     end
 end

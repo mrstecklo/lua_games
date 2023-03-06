@@ -1,5 +1,6 @@
-gl = require("opengl")
-glut = require("glut")
+local gl = require("opengl")
+local glut = require("glut")
+local timer = require("timer")
 
 local window = {
     width = 600,
@@ -132,7 +133,7 @@ function OnKey(key, px, py)
     local KEY_D = 100
 
     local KEY_8 = 56
-    local KEY_2 = 50
+    local KEY_5 = 53
     local KEY_4 = 52
     local KEY_6 = 54
 
@@ -144,7 +145,7 @@ function OnKey(key, px, py)
                 new_direction = dir.UP
             elseif (key == KEY_A or key == KEY_4) and direction ~= dir.RIGHT then
                 new_direction = dir.LEFT
-            elseif (key == KEY_S or key == KEY_2) and direction ~= dir.UP then
+            elseif (key == KEY_S or key == KEY_5) and direction ~= dir.UP then
                 new_direction = dir.DOWN
             elseif (key == KEY_D or key == KEY_6) and direction ~= dir.LEFT then
                 new_direction = dir.RIGHT
@@ -199,10 +200,19 @@ local function Move()
 end
 
 function IdleFunc()
+    local period_ms = 500
+    local milli = 1000
+    local modulo_s = 10
+    local modulo_ms = modulo_s * milli
     if state then
-        local now = os.time()
+        local now_s, now_ms = timer.GetTime()
+        local now = (now_s % modulo_s) * milli + now_ms
         time = time or now
-        if os.difftime(now, time) > 0 then
+        local next_time = time + period_ms
+        if next_time >= modulo_ms and now < time then
+            next_time = next_time % modulo_ms
+        end
+        if now > next_time then
             time = now
             if Move() then
                 DrawFrame()

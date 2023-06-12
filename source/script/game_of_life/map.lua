@@ -50,20 +50,18 @@ local function empty(first, second)
 end
 
 local function copy(t)
-    local r = empty(t)
-    for i = 1, t.width * t.height do
-        r[i] = t[i]
+    local r = {}
+    for k, v in pairs(t) do
+        r[k] = v
     end
     return r
 end
 
 local function random(first, second)
     local t = empty(first, second)
-    for x = 1, t.width do
-        for y = 1, t.height do
-            if math.random(9) == 1 then
-                t[idx(t, x, y)] = 1
-            end
+    for i = 1, t.width * t.height do
+        if math.random(9) == 1 then
+            t[i] = 1
         end
     end
     return t

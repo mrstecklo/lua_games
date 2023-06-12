@@ -16,7 +16,11 @@ local function at(t, x, y, wrap)
     return t[idx(t, x, y, wrap)]
 end
 
-local function _pairs(t)
+local function coord(t, i)
+    return (i - 1) % t.width + 1, 1 + (i - 1) // t.width
+end
+
+local function map_pairs(t)
     local f, s, k = pairs(t)
     local size = t.width * t.height
     local iterator = function (state, key)
@@ -84,17 +88,21 @@ end
 
 local function next_generation(t, wrap)
     local ng = empty(t)
-    for x = 1, t.width do
-        for y = 1, t.height do
-            local count = 0
-            for _, n in ipairs(neighbours) do
-                if at(t, x + n[1], y + n[2], wrap) then
-                    count = count + 1
-                end
+    for i in map_pairs(t) do
+        local x, y = coord(t, i)
+        for _, n in pairs(neighbours) do
+            local ng_i = idx(ng, x + n[1], y + n[2], wrap)
+            if ng_i then
+                ng[ng_i] = (ng[ng_i] or 0) + 1
             end
-            if (at(t, x, y) and count == 2) or (count == 3) then
-                ng[idx(ng, x, y)] = 1
-            end
+        end
+    end
+
+    for i, count in map_pairs(ng) do
+        if count == 3 or (t[i] and count == 2) then
+            ng[i] = 1
+        else
+            ng[i] = nil
         end
     end
     return ng
@@ -103,7 +111,8 @@ end
 return {
     idx = idx,
     at = at,
-    pairs = _pairs,
+    coord = coord,
+    pairs = map_pairs,
     empty = empty,
     copy = copy,
     random = random,

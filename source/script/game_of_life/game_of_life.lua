@@ -12,16 +12,13 @@ local window = {
 }
 
 local function DrapMap(t, scale)
-    for x = 1, t.width do
+    for i in map_util.pairs(t) do
+        local x, y = map_util.coord(t, i)
         local left = (x - 0.5 * (1 + scale)) / t.width
         local right = left + scale / t.width
-        for y = 1, t.height do
-            local top = (y - 0.5 * (1 + scale)) / t.height
-            local bottom = top + scale / t.height
-            if(map_util.at(t, x, y)) then
-                gl.Rect(left, top, right, bottom)
-            end
-        end
+        local top = (y - 0.5 * (1 + scale)) / t.height
+        local bottom = top + scale / t.height
+        gl.Rect(left, top, right, bottom)
     end
 end
 

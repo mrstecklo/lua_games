@@ -1,6 +1,7 @@
 gl = require("opengl")
 glut = require("glut")
 local help = require("game_of_life.help")
+local map_util = require("game_of_life.map")
 
 local args
 local map
@@ -10,74 +11,6 @@ local window = {
     height = 800,
 }
 
-local neighbours = {
-    {-1, -1}, { 0, -1}, { 1, -1},
-    {-1,  0},           { 1,  0},
-    {-1,  1}, { 0,  1}, { 1,  1},
-}
-
-local function idx(t, x, y)
-    if not args.wrap and (x < 1 or x > t.width or y < 1 or y > t.height) then
-        return nil
-    else
-        return (x - 1) % t.width + ((y - 1) % t.height) * t.width + 1
-    end
-end
-
-local function at(t, x, y)
-    return t[idx(t, x, y)]
-end
-
-local function EmptyMap(first, second)
-    if type(first) == "table" then
-        return  {
-            width = first.width,
-            height = first.height,
-        }
-    else
-        return {
-            width = first,
-            height = second,
-        }
-    end
-end
-
-local function CopyMap(t)
-    local r = EmptyMap(t)
-    for i = 1, t.width * t.height do
-        r[i] = t[i]
-    end
-    return r
-end
-
-local function RandomMap(first, second)
-    local t = EmptyMap(first, second)
-    for x = 1, t.width do
-        for y = 1, t.height do
-            if math.random(9) == 1 then
-                t[idx(t, x, y)] = 1
-            end
-        end
-    end
-    return t
-end
-
-local function DumpMap(t)
-    local file = io.open("map_" .. math.abs(math.random(0)) .. ".lua", "w+")
-    file:write("return {\n")
-    file:write("    width = ", t.width, ",\n")
-    file:write("    height = ", t.height, ",\n")
-    for y = 1, t.height do
-        file:write("   ")
-        for x = 1, t.width do
-            file:write((at(t, x, y) and "   1" or " nil"), ",")
-        end
-        file:write("\n")
-    end
-    file:write("}\n")
-    file:close()
-end
-
 local function DrapMap(t, scale)
     for x = 1, t.width do
         local left = (x - 0.5 * (1 + scale)) / t.width
@@ -85,29 +18,11 @@ local function DrapMap(t, scale)
         for y = 1, t.height do
             local top = (y - 0.5 * (1 + scale)) / t.height
             local bottom = top + scale / t.height
-            if(at(t, x, y)) then
+            if(map_util.at(t, x, y)) then
                 gl.Rect(left, top, right, bottom)
             end
         end
     end
-end
-
-local function NextGeneration(t)
-    local ng = EmptyMap(t)
-    for x = 1, t.width do
-        for y = 1, t.height do
-            local count = 0
-            for _, n in ipairs(neighbours) do
-                if at(t, x + n[1], y + n[2]) then
-                    count = count + 1
-                end
-            end
-            if (at(t, x, y) and count == 2) or (count == 3) then
-                ng[idx(ng, x, y)] = 1
-            end
-        end
-    end
-    return ng
 end
 
 function Reshape(width, height)
@@ -150,15 +65,15 @@ function OnKey(key, px, py)
     local KEY_C = 99
 
     if key == SPACE then
-        map = NextGeneration(map)
+        map = map_util.next_generation(map, args.wrap)
     elseif key == KEY_M then
-        DumpMap(map)
+        map_util.dump(map, "map_" .. math.abs(math.random(0)) .. ".lua")
     elseif key == KEY_R then
-        map = RandomMap(map)
+        map = map_util.random(map)
     elseif key == KEY_C then
-        map = EmptyMap(map)
+        map = map_util.empty(map)
     elseif key == KEY_H then
-        map = CopyMap(help)
+        map = map_util.copy(help)
     end
     DrawFrame()
 end
@@ -176,9 +91,9 @@ local function HandleMouseButton(px, py)
     local y = py * map.height // window.height + 1
 
     if mouse_button == MB_LEFT then
-        map[idx(map, x, y)] = 1
+        map[map_util.idx(map, x, y)] = 1
     elseif mouse_button == MB_RIGHT then
-        map[idx(map, x, y)] = nil
+        map[map_util.idx(map, x, y)] = nil
     end
     DrawFrame()
 end
@@ -217,7 +132,7 @@ end
 args = parse_args(...)
 
 if args.map_width and args.map_height then
-    map = EmptyMap(args.map_width, args.map_height)
+    map = map_util.empty(args.map_width, args.map_height)
 end
 
 if args.map_module then
@@ -227,7 +142,7 @@ if args.map_module then
     map = require("game_of_life." .. args.map_module)
 end
 
-map = map or CopyMap(require("game_of_life.help"))
+map = map or map_util.copy(require("game_of_life.help"))
 
 glut.Init()
 glut.InitDisplayMode()

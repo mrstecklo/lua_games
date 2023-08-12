@@ -3,6 +3,7 @@ include("test")
 add_custom_target(test_scripts.copy_to_runtime
     ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/game_of_life ${RUNTIME_DIRECTORY}/game_of_life/test
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/path_finder ${RUNTIME_DIRECTORY}/path_finder/test
 )
 
 add_dependencies(test_scripts.copy_to_runtime scripts.copy_to_runtime)
@@ -57,4 +58,8 @@ add_lua_test(game_of_life/invalid_size
 
 add_lua_test(game_of_life/map
     ARGS game_of_life/test/test_map.lua
+)
+
+add_lua_test(path_finder/path
+    ARGS path_finder/test/test_path.lua
 )

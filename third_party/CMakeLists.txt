@@ -1,3 +1,4 @@
+add_subdirectory(argparse)
 add_subdirectory(opengl)
 add_subdirectory(glut)
 add_subdirectory(lua)

@@ -6,7 +6,10 @@ add_custom_target(test_scripts.copy_to_runtime
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/game_of_life ${RUNTIME_DIRECTORY}/test/game_of_life
 )
 
-add_dependencies(test_scripts.copy_to_runtime scripts.copy_to_runtime)
+add_dependencies(test_scripts.copy_to_runtime
+    scripts.copy_to_runtime
+    luaunit
+)
 
 add_lua_test(third_party/luagl
     ARGS luagl/test1.lua

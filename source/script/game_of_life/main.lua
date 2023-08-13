@@ -1,8 +1,9 @@
-gl = require("opengl")
-glut = require("glut")
+local gl = require("opengl")
+local glut = require("glut")
 local help = require("game_of_life.data.help")
 local map = require("common.map")
 local life_map = require("game_of_life.life_map")
+local argparse = require("argparse")
 
 local args
 local game_map
@@ -110,34 +111,42 @@ function OnMouseMotion(px, py)
 end
 
 local function parse_args(...)
-    local args = {}
-    for _, val in ipairs({...}) do
-        if string.find(val, "^-") then
-            if val == "--wrap" then
-                args.wrap = true
-            elseif string.find(val, "^--size=") then
-                args.map_width, args.map_height = string.match(val, "^--size=(%d+)x(%d+)")
-                args.map_width = tonumber(args.map_width)
-                args.map_height = tonumber(args.map_height)
+    local parser = argparse("game_of_life/main.lua", "Conway's Game of Life")
+    parser:argument("map_module", "Map module file name, e.g. 'gospers_gun'"):args("?")
+    parser:flag("--wrap", "Wrap map around")
+    parser:option("--size", "Map size. <width>x<height>")
+        :convert(
+            function(str)
+                local w, h = string.match(str, "^(%d+)x(%d+)$")
+                local result = {
+                    width = tonumber(w),
+                    height = tonumber(h),
+                }
+                if result.width and result.height then
+                    return result
+                end
+                return nil, "option '--size' must be <width>x<height>"
             end
-        else
-            args.map_module = val
-        end
+        )
+    local args = parser:parse{...}
+    if args.size and args.map_module then
+        print("Warning: both '--size' and '<map_module>' are specified. Ignoring '--size' option")
+        args.size = nil
     end
     return args
 end
 
 args = parse_args(...)
 
-if args.map_width and args.map_height then
-    game_map = map.empty(args.map_width, args.map_height)
-end
-
-if args.map_module then
-    if game_map then
-        print("warning: both --size and <map_module> are specified. Ignoring --size option")
+if args.size then
+    game_map = map.empty(args.size)
+elseif args.map_module then
+    local success
+    success, game_map = pcall(require, "game_of_life.data." .. args.map_module)
+    if not success then
+        print("Warning: cant find map module '" .. args.map_module .. ".lua' in game_of_life/data")
+        game_map = nil
     end
-    game_map = require("game_of_life.data." .. args.map_module)
 end
 
 game_map = game_map or map.copy(help)

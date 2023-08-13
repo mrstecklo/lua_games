@@ -3,7 +3,7 @@ local glut = require("glut")
 local help = require("game_of_life.data.help")
 local map = require("common.map")
 local life_map = require("game_of_life.life_map")
-local argparse = require("argparse")
+local program_options = require("game_of_life.program_options")
 
 local args
 local game_map
@@ -110,33 +110,7 @@ function OnMouseMotion(px, py)
     HandleMouseButton(px, py)
 end
 
-local function parse_args(...)
-    local parser = argparse("game_of_life/main.lua", "Conway's Game of Life")
-    parser:argument("map_module", "Map module file name, e.g. 'gospers_gun'"):args("?")
-    parser:flag("--wrap", "Wrap map around")
-    parser:option("--size", "Map size. <width>x<height>")
-        :convert(
-            function(str)
-                local w, h = string.match(str, "^(%d+)x(%d+)$")
-                local result = {
-                    width = tonumber(w),
-                    height = tonumber(h),
-                }
-                if result.width and result.height then
-                    return result
-                end
-                return nil, "option '--size' must be <width>x<height>"
-            end
-        )
-    local args = parser:parse{...}
-    if args.size and args.map_module then
-        print("Warning: both '--size' and '<map_module>' are specified. Ignoring '--size' option")
-        args.size = nil
-    end
-    return args
-end
-
-args = parse_args(...)
+args = program_options.parse(...)
 
 if args.size then
     game_map = map.empty(args.size)

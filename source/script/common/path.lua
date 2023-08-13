@@ -1,4 +1,4 @@
-local map = require("game_of_life.map")
+local map = require("common.map")
 
 local neighbours = {
             { 0, -1},

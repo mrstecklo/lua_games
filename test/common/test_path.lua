@@ -1,10 +1,10 @@
 local lu = require("luaunit")
-local map = require("game_of_life.map")
-local path = require("path_finder.path")
+local map = require("common.map")
+local path = require("common.path")
 
-TestMap = {}
+TestPath = {}
 
-function TestMap.test_find__DoesNotGoOutside()
+function TestPath.test_find__DoesNotGoOutside()
     local t = map.empty(10, 5)
     lu.assertEquals(path.find(t, {1, 1}, {0, 1}), nil)
     lu.assertEquals(path.find(t, {1, 1}, {1, 0}), nil)
@@ -12,7 +12,7 @@ function TestMap.test_find__DoesNotGoOutside()
     lu.assertEquals(path.find(t, {1, 1}, {1, 6}), nil)
 end
 
-function TestMap.test_find__HandlesStraightLines()
+function TestPath.test_find__HandlesStraightLines()
     local t = map.empty(10, 10)
     lu.assertEquals(path.find(t, {1, 1}, {1, 1}), {})
     lu.assertEquals(path.find(t, {1, 2}, {2, 2}), {{2, 2}})
@@ -25,7 +25,7 @@ function TestMap.test_find__HandlesStraightLines()
     lu.assertEquals(path.find(t, {1, 1}, {3, 1}), {{2, 1}, {3, 1}})
 end
 
-function TestMap.test_find__HandlesShortDiagonal()
+function TestPath.test_find__HandlesShortDiagonal()
     local t = map.empty(10, 10)
     local p = path.find(t, {1, 1}, {2, 2})
     lu.assertEquals(#p, 2)
@@ -33,7 +33,7 @@ function TestMap.test_find__HandlesShortDiagonal()
     lu.assertTableContains({{1, 2}, {2, 1}}, p[1])
 end
 
-function TestMap.test_find__HandlesRectangleDiagonal()
+function TestPath.test_find__HandlesRectangleDiagonal()
     local t = map.empty(10, 10)
     local start = {1, 1}
     local finish = {2, 10}
@@ -57,7 +57,7 @@ function TestMap.test_find__HandlesRectangleDiagonal()
     end
 end
 
-function TestMap.test_find__HandlesSouthWestDiagonal()
+function TestPath.test_find__HandlesSouthWestDiagonal()
     local t = map.empty(10, 10)
     local start = {1, 10}
     local finish = {10, 1}
@@ -89,7 +89,7 @@ function TestMap.test_find__HandlesSouthWestDiagonal()
     end
 end
 
-function TestMap.test_find__GoesAroundObstacle()
+function TestPath.test_find__GoesAroundObstacle()
     local t = {
         width = 3,
         height = 3,
@@ -104,7 +104,7 @@ function TestMap.test_find__GoesAroundObstacle()
     )
 end
 
-function TestMap.test_find__CantWalkThroughWall()
+function TestPath.test_find__CantWalkThroughWall()
     local t = {
         width = 3,
         height = 3,
@@ -119,7 +119,7 @@ function TestMap.test_find__CantWalkThroughWall()
     )
 end
 
-function TestMap.test_find__DoesNotReuseFinish()
+function TestPath.test_find__DoesNotReuseFinish()
     local t = map.empty(10, 10)
     local finish = {1, 2}
     local p = path.find(t, {1, 1}, finish)

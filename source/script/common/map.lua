@@ -1,9 +1,3 @@
-local neighbours = {
-    {-1, -1}, { 0, -1}, { 1, -1},
-    {-1,  0},           { 1,  0},
-    {-1,  1}, { 0,  1}, { 1,  1},
-}
-
 local function idx(t, x, y, wrap)
     if not wrap and (x < 1 or x > t.width or y < 1 or y > t.height) then
         return nil
@@ -67,7 +61,6 @@ local function random(first, second)
     return t
 end
 
-
 local function dump(t, name)
     local file = io.open(name, "w+")
     file:write("return {\n")
@@ -84,28 +77,6 @@ local function dump(t, name)
     file:close()
 end
 
-local function next_generation(t, wrap)
-    local ng = empty(t)
-    for i in map_pairs(t) do
-        local x, y = coord(t, i)
-        for _, n in pairs(neighbours) do
-            local ng_i = idx(ng, x + n[1], y + n[2], wrap)
-            if ng_i then
-                ng[ng_i] = (ng[ng_i] or 0) + 1
-            end
-        end
-    end
-
-    for i, count in map_pairs(ng) do
-        if count == 3 or (t[i] and count == 2) then
-            ng[i] = 1
-        else
-            ng[i] = nil
-        end
-    end
-    return ng
-end
-
 return {
     idx = idx,
     at = at,
@@ -115,5 +86,4 @@ return {
     copy = copy,
     random = random,
     dump = dump,
-    next_generation = next_generation,
 }

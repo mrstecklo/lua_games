@@ -1,14 +1,14 @@
 local gl = require("opengl")
 local glut = require("glut")
-local map_util = require("game_of_life.map")
-local path = require("path_finder.path")
+local map = require("common.map")
+local path = require("common.path")
 local timer = require("timer")
 
 local window = {
     width = 800,
     height = 800,
 }
-local map = require("path_finder.map_1")
+local game_map = require("path_finder.data.map")
 local unit = {
     coord = {1, 1},
     path = {},
@@ -22,9 +22,9 @@ local function DrawCell(t, x, y, scale)
     gl.Rect(left, top, right, bottom)
 end
 
-local function DrapMap(t, scale)
-    for i in map_util.pairs(t) do
-        local x, y = map_util.coord(t, i)
+local function DrawMap(t, scale)
+    for i in map.pairs(t) do
+        local x, y = map.coord(t, i)
         DrawCell(t, x, y, scale)
     end
 end
@@ -59,9 +59,9 @@ function DrawFrame()
     gl.Enable("BLEND")
 
     gl.Color( {1, 1, 0, 1} )
-    DrapMap(map, 0.8)
+    DrawMap(game_map, 0.8)
     gl.Color( {1, 0, 0, 1} )
-    DrawUnit(map, unit.coord, 0.5)
+    DrawUnit(game_map, unit.coord, 0.5)
 
     glut.SwapBuffers()
     gl.Flush()
@@ -77,21 +77,21 @@ local function HandleMouseButton(px, py)
     local MB_MIDDLE = 1
     local MB_RIGHT = 2
 
-    local x = px * map.width // window.width + 1
-    local y = py * map.height // window.height + 1
+    local x = px * game_map.width // window.width + 1
+    local y = py * game_map.height // window.height + 1
 
     local finish
     if mouse_button == MB_LEFT then
-        map[map_util.idx(map, x, y)] = 1
+        game_map[map.idx(game_map, x, y)] = 1
         finish = unit.path[#unit.path]
     elseif mouse_button == MB_RIGHT then
         finish = {x, y}
     elseif mouse_button == MB_MIDDLE then
-        map[map_util.idx(map, x, y)] = nil
+        game_map[map.idx(game_map, x, y)] = nil
         finish = unit.path[#unit.path]
     end
     if finish then
-        unit.path = path.find(map, unit.coord, finish) or {}
+        unit.path = path.find(game_map, unit.coord, finish) or {}
     end
     DrawFrame()
 end

@@ -1,19 +1,20 @@
 gl = require("opengl")
 glut = require("glut")
-local help = require("game_of_life.help")
-local map_util = require("game_of_life.map")
+local help = require("game_of_life.data.help")
+local map = require("common.map")
+local life_map = require("game_of_life.life_map")
 
 local args
-local map
+local game_map
 
 local window = {
     width = 800,
     height = 800,
 }
 
-local function DrapMap(t, scale)
-    for i in map_util.pairs(t) do
-        local x, y = map_util.coord(t, i)
+local function DrawMap(t, scale)
+    for i in map.pairs(t) do
+        local x, y = map.coord(t, i)
         local left = (x - 0.5 * (1 + scale)) / t.width
         local right = left + scale / t.width
         local top = (y - 0.5 * (1 + scale)) / t.height
@@ -48,7 +49,7 @@ function DrawFrame()
     gl.Enable("BLEND")
 
     gl.Color( {1, 1, 0, 1} )
-    DrapMap(map, 0.8)
+    DrawMap(game_map, 0.8)
 
     glut.SwapBuffers()
     gl.Flush()
@@ -62,15 +63,15 @@ function OnKey(key, px, py)
     local KEY_C = 99
 
     if key == SPACE then
-        map = map_util.next_generation(map, args.wrap)
+        game_map = life_map.next_generation(game_map, args.wrap)
     elseif key == KEY_M then
-        map_util.dump(map, "map_" .. math.abs(math.random(0)) .. ".lua")
+        map.dump(game_map, "map_" .. math.abs(math.random(0)) .. ".lua")
     elseif key == KEY_R then
-        map = map_util.random(map)
+        game_map = map.random(game_map)
     elseif key == KEY_C then
-        map = map_util.empty(map)
+        game_map = map.empty(game_map)
     elseif key == KEY_H then
-        map = map_util.copy(help)
+        game_map = map.copy(help)
     end
     DrawFrame()
 end
@@ -84,13 +85,13 @@ local function HandleMouseButton(px, py)
     local MB_LEFT = 0
     local MB_RIGHT = 2
 
-    local x = px * map.width // window.width + 1
-    local y = py * map.height // window.height + 1
+    local x = px * game_map.width // window.width + 1
+    local y = py * game_map.height // window.height + 1
 
     if mouse_button == MB_LEFT then
-        map[map_util.idx(map, x, y)] = 1
+        game_map[map.idx(game_map, x, y)] = 1
     elseif mouse_button == MB_RIGHT then
-        map[map_util.idx(map, x, y)] = nil
+        game_map[map.idx(game_map, x, y)] = nil
     end
     DrawFrame()
 end
@@ -129,17 +130,17 @@ end
 args = parse_args(...)
 
 if args.map_width and args.map_height then
-    map = map_util.empty(args.map_width, args.map_height)
+    game_map = map.empty(args.map_width, args.map_height)
 end
 
 if args.map_module then
-    if map then
+    if game_map then
         print("warning: both --size and <map_module> are specified. Ignoring --size option")
     end
-    map = require("game_of_life." .. args.map_module)
+    game_map = require("game_of_life.data." .. args.map_module)
 end
 
-map = map or map_util.copy(require("game_of_life.help"))
+game_map = game_map or map.copy(help)
 
 glut.Init()
 glut.InitDisplayMode()
